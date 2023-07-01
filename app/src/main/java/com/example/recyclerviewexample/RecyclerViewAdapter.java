@@ -1,11 +1,18 @@
 package com.example.recyclerviewexample;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +53,72 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         // now set the data
         holder.imageView.setImageResource(data.get(position).image); // set image
         holder.textView.setText(data.get(position).text); // set text
+
+        // adding click event to each item
+        // adding functionality to update the item
+        holder.linearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog dialog = new Dialog(context);
+                dialog.setContentView(R.layout.dialog_add_update_layout);
+
+                EditText editText = dialog.findViewById(R.id.dialog_add_update_edittext);
+                Button button = dialog.findViewById(R.id.dialog_add_update_button);
+                TextView textView = dialog.findViewById(R.id.dialog_add_update_textview);
+
+                textView.setText("Update the item");
+                button.setText("Update");
+                editText.setText(data.get(position).text);
+
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        String name = editText.getText().toString();
+                        if(!name.equals("")) {
+                            data.set(position, new CustomData(data.get(position).image, name));
+                            notifyItemChanged(position);
+                            dialog.dismiss();
+                        } else {
+                            Toast.makeText(context, "Name can't be empty", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+
+                dialog.show();
+            }
+        });
+
+
+        holder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                String name = data.get(position).text;
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Delete")
+                        .setMessage("Do you really want to delete the entry " + name + "?")
+                        .setIcon(R.drawable.delete_button)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                data.remove(position);
+                                notifyItemRemoved(position);
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(context, "Delete operatin cancelled", Toast.LENGTH_SHORT).show();
+                            }
+                        }).show();
+
+                return true;
+            }
+        });
+
+
     }
 
     @Override
@@ -57,11 +130,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         ImageView imageView;
         TextView textView;
+        LinearLayout linearLayout;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.recycler_view_item_image);
             textView = itemView.findViewById(R.id.recycler_view_item_text);
+            linearLayout = itemView.findViewById(R.id.recycler_view_item_ll);
         }
     }
 }
