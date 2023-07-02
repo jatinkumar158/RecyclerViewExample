@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,6 +25,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     Context context;
     ArrayList<CustomData> data;
+    private int lastPosition = -1;
 
     public RecyclerViewAdapter(Context context, ArrayList<CustomData> data) {
         // As current class is not an activity class so we can't use this keyword
@@ -53,6 +56,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         // now set the data
         holder.imageView.setImageResource(data.get(position).image); // set image
         holder.textView.setText(data.get(position).text); // set text
+
+        // animate each item
+        animateView(holder.itemView, position);
 
         // adding click event to each item
         // adding functionality to update the item
@@ -139,4 +145,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             linearLayout = itemView.findViewById(R.id.recycler_view_item_ll);
         }
     }
+
+    private void animateView(View view, int position) {
+
+        if(position > lastPosition) {
+            Animation slideIn = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+            view.startAnimation(slideIn);
+            lastPosition = position;
+        }
+
+    }
+
 }
